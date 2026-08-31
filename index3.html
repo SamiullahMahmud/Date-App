@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Be My Date Proposal</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="container">
+    <div class="heart-bg">💖</div>
+    
+    <h1 id="main-title">Will you go on a date with me?</h1>
+    <p id="sub-title">I promise it will be an unforgettable time!</p>
+
+    <div class="btn-group-wrapper" id="btn-wrapper">
+      <div class="btn-group" id="btn-group">
+        <button class="btn-yes" id="yes-btn">YES!</button>
+        <button class="btn-no" id="no-btn">No</button>
+      </div>
+    </div>
+
+    <div class="section" id="planner-section">
+      <h2 class="section-title">Plan Our Perfect Date 💕</h2>
+      
+      <form id="date-form" action="https://formspree.io/f/mnpqpqeoh" method="POST">
+        <div class="form-group">
+          <label for="date-select">📅 Choose the Date</label>
+          <input type="date" id="date-select" name="Date" required>
+        </div>
+
+        <div class="form-group">
+          <label for="time-select">⏰ Pick a Time</label>
+          <input type="time" id="time-select" name="Time" required>
+        </div>
+
+        <div class="form-group">
+          <label for="place-input">📍 Where Should We Go?</label>
+          <input type="text" id="place-input" name="Place" placeholder="e.g. Cozy Cafe, Beachside, Rooftop..." required>
+        </div>
+
+        <div class="form-group">
+          <label for="food-input">🍕 What Are You Craving?</label>
+          <input type="text" id="food-input" name="Food" placeholder="e.g. Italian, Sushi, Ice Cream..." required>
+        </div>
+
+        <button type="submit" class="submit-btn" id="submit-btn">Done! Lock It In ✨</button>
+      </form>
+    </div>
+
+    <div class="section" id="summary-section">
+      <h2 class="section-title">It's Official! 🎉</h2>
+      <div class="summary-card">
+        <p><strong>📅 Date:</strong> <span id="sum-date"></span></p>
+        <p><strong>⏰ Time:</strong> <span id="sum-time"></span></p>
+        <p><strong>📍 Place:</strong> <span id="sum-place"></span></p>
+        <p><strong>🍕 Food:</strong> <span id="sum-food"></span></p>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const noBtn = document.getElementById('no-btn');
+    const yesBtn = document.getElementById('yes-btn');
+    const btnWrapper = document.getElementById('btn-wrapper');
+    const plannerSection = document.getElementById('planner-section');
+    const summarySection = document.getElementById('summary-section');
+    const dateForm = document.getElementById('date-form');
+
+    let isEvading = false;
+
+    // Trigger runaway movement for the No button
+    noBtn.addEventListener('mouseover', moveNoButton);
+    noBtn.addEventListener('touchstart', moveNoButton);
+
+    function moveNoButton() {
+      if (!isEvading) {
+        // Switch to absolute positioning once evasion begins
+        noBtn.style.position = 'absolute';
+        isEvading = true;
+      }
+
+      const containerRect = btnWrapper.getBoundingClientRect();
+      const btnRect = noBtn.getBoundingClientRect();
+
+      const maxX = containerRect.width - btnRect.width;
+      const maxY = 120; 
+
+      const randomX = Math.floor(Math.random() * Math.max(0, maxX));
+      const randomY = Math.floor(Math.random() * maxY) - 10;
+
+      noBtn.style.left = `${randomX}px`;
+      noBtn.style.top = `${randomY}px`;
+    }
+
+    // "YES!" Button Click Handler
+    yesBtn.addEventListener('click', () => {
+      document.getElementById('main-title').innerText = "Yay! You said YES! 🥰";
+      document.getElementById('sub-title').innerText = "Now tell me what your dream date looks like:";
+      btnWrapper.style.display = 'none';
+      plannerSection.style.display = 'block';
+    });
+
+    // Handle Form Submission & Formspree Notification
+    dateForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const submitBtn = document.getElementById('submit-btn');
+      submitBtn.innerText = "Sending... 💌";
+      submitBtn.disabled = true;
+
+      const dateVal = document.getElementById('date-select').value;
+      const timeVal = document.getElementById('time-select').value;
+      const placeVal = document.getElementById('place-input').value;
+      const foodVal = document.getElementById('food-input').value;
+
+      const formData = new FormData(dateForm);
+
+      try {
+        const response = await fetch(dateForm.action, {
+          method: 'POST',
+          body: formData,
+          headers: { 'Accept': 'application/json' }
+        });
+
+        if (response.ok) {
+          document.getElementById('sum-date').innerText = dateVal;
+          document.getElementById('sum-time').innerText = timeVal;
+          document.getElementById('sum-place').innerText = placeVal;
+          document.getElementById('sum-food').innerText = foodVal;
+
+          plannerSection.style.display = 'none';
+          summarySection.style.display = 'block';
+          document.getElementById('sub-title').innerText = "I've received your plan! See you then ❤️";
+        } else {
+          alert("Oops! Something went wrong while saving choices. Please try again.");
+          submitBtn.innerText = "Done! Lock It In ✨";
+          submitBtn.disabled = false;
+        }
+      } catch (error) {
+        alert("Network error. Please try clicking done again.");
+        submitBtn.innerText = "Done! Lock It In ✨";
+        submitBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

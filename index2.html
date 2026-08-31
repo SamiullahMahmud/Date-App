@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -79,7 +80,7 @@
       font-size: 0.95rem;
     }
 
-    /* Side-by-Side Flexbox Alignment */
+    /* Side-by-Side Floating Wrapper for Buttons */
     .btn-group-wrapper {
       position: relative;
       width: 100%;
@@ -90,14 +91,15 @@
     .btn-group {
       display: flex;
       justify-content: center;
-      align-items: center;
-      gap: 15px;
+      gap: 20px;
       width: 100%;
-      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
     }
 
     button, .submit-btn {
-      padding: 12px 32px;
+      padding: 12px 30px;
       font-size: 1rem;
       font-weight: 700;
       border: none;
@@ -117,11 +119,12 @@
       transform: translateY(-2px) scale(1.04);
     }
 
-    /* Fixed No Button Alignment */
     .btn-no {
       background-color: var(--gray);
       color: white;
-      position: relative;
+      position: absolute;
+      left: 55%;
+      top: 0;
       transition: all 0.15s ease-out;
     }
 
@@ -138,6 +141,7 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
+    /* Form Fields for Girls Choice */
     .form-group {
       text-align: left;
       margin-bottom: 15px;
@@ -152,7 +156,7 @@
       text-transform: uppercase;
     }
 
-    input {
+    input, select, textarea {
       width: 100%;
       padding: 12px;
       border: 1px solid #ffccd5;
@@ -163,7 +167,7 @@
       outline: none;
     }
 
-    input:focus {
+    input:focus, select:focus, textarea:focus {
       border-color: var(--primary);
       box-shadow: 0 0 8px rgba(255, 77, 109, 0.3);
     }
@@ -173,6 +177,7 @@
       margin-top: 10px;
     }
 
+    /* Confirmation Card */
     .summary-card {
       background: #fff0f3;
       padding: 15px;
@@ -195,7 +200,6 @@
     <h1 id="main-title">Will you go on a date with me?</h1>
     <p id="sub-title">I promise it will be an unforgettable time!</p>
 
-    <!-- Side-by-Side Hero Buttons -->
     <div class="btn-group-wrapper" id="btn-wrapper">
       <div class="btn-group">
         <button class="btn-yes" id="yes-btn">YES!</button>
@@ -203,36 +207,33 @@
       </div>
     </div>
 
-    <!-- Choice Form Section -->
     <div class="section" id="planner-section">
       <h2 style="color: var(--accent); margin-bottom: 15px;">Plan Our Perfect Date 💕</h2>
-      
-      <form id="date-form" action="https://formspree.io/f/mnpqpqeo" method="POST">
+      <form id="date-form">
         <div class="form-group">
-          <label for="date-select">📅 Choose or Type the Date</label>
-          <input type="date" id="date-select" name="Date" required>
+          <label for="date-select">📅 Choose the Date</label>
+          <input type="date" id="date-select" required>
         </div>
 
         <div class="form-group">
-          <label for="time-select">⏰ Pick or Type a Time</label>
-          <input type="time" id="time-select" name="Time" required>
+          <label for="time-select">⏰ Pick a Time</label>
+          <input type="time" id="time-select" required>
         </div>
 
         <div class="form-group">
           <label for="place-input">📍 Where Should We Go?</label>
-          <input type="text" id="place-input" name="Place" placeholder="e.g. Cozy Cafe, Beachside..." required>
+          <input type="text" id="place-input" placeholder="e.g. Cozy Cafe, Beachside, Rooftop..." required>
         </div>
 
         <div class="form-group">
           <label for="food-input">🍕 What Are You Craving?</label>
-          <input type="text" id="food-input" name="Food" placeholder="e.g. Italian, Sushi, Ice Cream..." required>
+          <input type="text" id="food-input" placeholder="e.g. Italian, Sushi, Ice Cream..." required>
         </div>
 
-        <button type="submit" class="submit-btn" id="submit-btn">Lock It In! ✨</button>
+        <button type="submit" class="submit-btn">Lock It In! ✨</button>
       </form>
     </div>
 
-    <!-- Final Summary Section -->
     <div class="section" id="summary-section">
       <h2 style="color: var(--accent); margin-bottom: 15px;">It's Official! 🎉</h2>
       <div class="summary-card">
@@ -252,7 +253,6 @@
     const plannerSection = document.getElementById('planner-section');
     const summarySection = document.getElementById('summary-section');
     const dateForm = document.getElementById('date-form');
-    const submitBtn = document.getElementById('submit-btn');
 
     // Runaway "No" Button Logic
     noBtn.addEventListener('mouseover', moveNoButton);
@@ -262,11 +262,8 @@
       const containerRect = btnWrapper.getBoundingClientRect();
       const btnRect = noBtn.getBoundingClientRect();
 
-      // Switch to absolute positioning only when hovered
-      noBtn.style.position = 'absolute';
-
       const maxX = containerRect.width - btnRect.width;
-      const maxY = 120;
+      const maxY = 150; // Allow it to run down slightly outside the wrapper
 
       const randomX = Math.floor(Math.random() * maxX);
       const randomY = Math.floor(Math.random() * maxY) - 20;
@@ -284,8 +281,8 @@
       plannerSection.style.display = 'block';
     });
 
-    // Form Submission Handler
-    dateForm.addEventListener('submit', async (e) => {
+    // Handle Form Submission
+    dateForm.addEventListener('submit', (e) => {
       e.preventDefault();
 
       const dateVal = document.getElementById('date-select').value;
@@ -293,40 +290,17 @@
       const placeVal = document.getElementById('place-input').value;
       const foodVal = document.getElementById('food-input').value;
 
-      submitBtn.innerText = "Sending... 💕";
-      submitBtn.disabled = true;
+      document.getElementById('sum-date').innerText = dateVal;
+      document.getElementById('sum-time').innerText = timeVal;
+      document.getElementById('sum-place').innerText = placeVal;
+      document.getElementById('sum-food').innerText = foodVal;
 
-      const formData = new FormData(dateForm);
-
-      try {
-        const response = await fetch(dateForm.action, {
-          method: 'POST',
-          body: formData,
-          headers: {
-            'Accept': 'application/json'
-          }
-        });
-
-        if (response.ok) {
-          document.getElementById('sum-date').innerText = dateVal;
-          document.getElementById('sum-time').innerText = timeVal;
-          document.getElementById('sum-place').innerText = placeVal;
-          document.getElementById('sum-food').innerText = foodVal;
-
-          plannerSection.style.display = 'none';
-          summarySection.style.display = 'block';
-          document.getElementById('sub-title').innerText = "I've saved all your choices! See you then ❤️";
-        } else {
-          alert("Please update your Formspree ID in the form action attribute.");
-          submitBtn.innerText = "Lock It In! ✨";
-          submitBtn.disabled = false;
-        }
-      } catch (error) {
-        alert("Submission failed. Check your internet connection.");
-        submitBtn.innerText = "Lock It In! ✨";
-        submitBtn.disabled = false;
-      }
+      plannerSection.style.display = 'none';
+      summarySection.style.display = 'block';
+      document.getElementById('sub-title').innerText = "I've saved all your choices! See you then ❤️";
     });
   </script>
 </body>
 </html>
+
+```
